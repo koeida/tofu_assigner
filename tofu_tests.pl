@@ -1,4 +1,6 @@
-:- [tofu].
+:- [misc].
+:- [tofu_procs].
+:- [test_workers].
 
 :- begin_tests(tofu).
 test(not_available) :-
@@ -54,6 +56,13 @@ test(assign_jobs_overlap, [nondet,fail]) :-
 test(assign_jobs_overlap, [nondet]) :-
     assign_jobs([j(kettle5, 1, block(9,12)),
                  j(kettle5, 2, block(9,12))],
+                _).
+
+% Create a test day where times are subsequent, but
+% on different days
+test(assign_jobs_overlap, [nondet]) :-
+    assign_jobs([j(kettle5, 1, block(9,12)),
+                 j(kettle5, 2, block(12,13))],
                 _).
 
 :- end_tests(tofu).
