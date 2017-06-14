@@ -1,6 +1,6 @@
 worker(
     keegan, 
-    [[block(1,2), block(4,5), block(10,12)],
+    [[block(4,5), block(10,12)],
      [block(3,4), block(4,5), block(10,12)],
      [block(1,2), block(4,5), block(10,12)],
      [block(3,4), block(4,5), block(10,12)],
@@ -10,8 +10,8 @@ worker(
     [kettle1,kettle2,pack2help,pack2honch]).
 worker(
     adder, 
-    [[block(4,5), block(10,12)],
-     [block(4,5), block(10,12)],
+    [[],
+     [],
      [block(4,5), block(10,12)],
      [block(4,5), block(10,12)],
      [block(4,5), block(10,12)],
@@ -47,10 +47,10 @@ worker(
      [block(4,5), block(7,9)],
      [block(4,5), block(7,9)],
      [block(4,5), block(7,9)]],
-    [kettle1,kettle2,pack1help,pack2help,pack2honch]).
+    [kettle1,pack1help,pack2help,pack2honch]).
 worker(
     rayne,
-    [[block(11,16)],
+    [[block(0,16)],
      [block(11,16)],
      [block(11,16)],
      [block(11,16)],

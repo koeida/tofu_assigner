@@ -9,37 +9,6 @@ test(not_available) :-
 test(available) :-
     available([block(1,2), block(4,5), block(10,12)], block(13,15)).
 
-test(sort_by_names_days,[nondet]) :-
-    sort_by_names_days([
-        ass(j(foo,1,block(1,2)),keeg),
-        ass(j(bak,1,block(2,3)),keeg)
-        ],
-        R),
-    R == names_days{keeg_1:[ass(j(foo,1,block(1,2)),keeg),ass(j(bak,1,block(2,3)),keeg)]}.
-
-test(sort_by_names_days2,[nondet]) :-
-    sort_by_names_days([
-        ass(j(foo,1,block(1,2)),keeg),
-        ass(j(bak,1,block(2,3)),mark)
-        ],
-        R),
-    R == names_days{keeg_1:[ass(j(foo,1,block(1,2)),keeg)],
-                    mark_1:[ass(j(bak,1,block(2,3)),mark)]}.
-
-test(sort_by_names_days2,[nondet]) :-
-    sort_by_names_days([
-        ass(j(foo,1,block(1,2)),keeg),
-        ass(j(bar,1,block(1,2)),keeg),
-        ass(j(bak,1,block(2,3)),mark)
-        ],
-        R),
-    R == names_days{keeg_1:[ass(j(foo,1,block(1,2)),keeg), ass(j(bar,1,block(1,2)),keeg)],
-                    mark_1:[ass(j(bak,1,block(2,3)),mark)]}.
-
-test(sort_by_names_days2,[nondet]) :-
-    sort_by_names_days([], R),
-    R == names_days{}.
-
 % Create a test assignment that forces subsequent shifts.
 test(assign_jobs_subseq, [nondet,fail]) :-
     assign_jobs([j(kettle5, 1, block(9,12)),
@@ -64,5 +33,13 @@ test(assign_jobs_overlap, [nondet]) :-
     assign_jobs([j(kettle5, 1, block(9,12)),
                  j(kettle5, 2, block(12,13))],
                 _).
+
+test(append_to_dict1) :-
+    append_to_dict(a,1, test{}, D),
+    D = test{a:[1]}.
+
+test(append_to_dict2, [nondet]) :-
+    append_to_dict(a,1, test{a:[0]}, D),
+    D = test{a:[0,1]}.
 
 :- end_tests(tofu).

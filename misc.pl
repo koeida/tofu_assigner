@@ -17,5 +17,12 @@ write_assignment_list([X|Xs]) :-
 
 do_write(Goal) :- 
     term_string(Goal,GStr),
-    format("~w~n", [GStr]),
+    %format("~w~n", [GStr]),
     Goal*->true ; format("failed: ~w~n", [GStr]).
+
+append_to_dict(Key, E, Dict, NewDict) :-
+    Val = Dict.get(Key),
+    append(Val,[E],NewVal),
+    NewDict = Dict.put(Key, NewVal),!.
+append_to_dict(Key, E, Dict, NewDict) :-
+    NewDict = Dict.put(Key,[E]).
