@@ -22,18 +22,23 @@ assign(j(JobName, Day, Block), P) :-
 subseq(block(_,T), block(T,_)).
 subseq(block(T,_), block(_,T)).
 
+% Glom together a person and day of the week into an atom
 job_key(Person,DayOfWeek,Key) :-
     atom_string(Person,PStr),
     number_string(DayOfWeek,DStr),
     string_concat(PStr,DStr,KeyS),
     atom_string(Key,KeyS).
 
+% The actual tofu assigning code.
 assign_jobs_int([],[], ADict, ADict).
 assign_jobs_int([CurJob|Js], [ass(CurJob,P)|As], ADict, ADictOut) :-
     CurJob = j(_, DayOfWeek, B),
+    %do_write(assign(CurJob,P)),
     assign(CurJob,P),
     job_key(P,DayOfWeek,Key),
     append_to_dict(Key, B,  ADict,    ADictNew),
+    length(ADictNew.get(Key),NumShifts),
+    NumShifts =< 2,
     not(bad_work(ADictNew.get(Key))),
     assign_jobs_int(Js, As, ADictNew, ADictOut).
 assign_jobs(Js,As) :-
@@ -62,17 +67,9 @@ comb2(_,[]).
 comb2([X|T],[X|Comb]):-comb2(T,Comb).
 comb2([_|T],[X|Comb]):-comb2(T,[X|Comb]).
 
-no_bad_work([]).
-no_bad_work(AGs) :- not(comb2(AGs, [block(S1,E1),block(S2,E2)])).
-no_bad_work(AGs) :-
-    comb2(AGs,[B1,B2]),
-    B1 = block(S1,E1),
-    B2 = block(S2,E2),
-    not(subseq(B1,B2) ; overlap(B1,B2)).
-
 bad_work(AGs) :-
     comb2(AGs,[B1,B2]),
     B1 = block(S1,E1),
-    B2 = block(S2,E2),
+    B2 = block(S2,E2), %without the following line, any 2 shifts for one person in one day is "bad work"
     (subseq(B1,B2) ; overlap(B1,B2)),!.
 
