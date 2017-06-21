@@ -1,6 +1,6 @@
 :- [misc].
 
-overlap(block(S1,E1),block(S2,E2)) :- max(S1,S2) < min(E1,E2).
+overlap(S1-E1,S2-E2) :- max(S1,S2) < min(E1,E2).
 
 available([],_).
 available([B|Bs], S) :-
@@ -12,15 +12,15 @@ works_job(Jobname,Jobs) :-
 works_job(_,Jobs) :-
     member(any,Jobs).
 
-assign(j(JobName, Day, Block), P) :- 
+assign(j(JobName, Day, S-E), P) :- 
     worker(P,Avails,Jobs),
     nth1(Day,Avails, Avail),
     works_job(JobName,Jobs),
-    available(Avail,Block).
+    available(Avail,S-E).
 
 % subseq(b1,b2) holds if b1 is followed immediately by b2 or vice versa
-subseq(block(_,T), block(T,_)).
-subseq(block(T,_), block(_,T)).
+subseq(_-T, T-_).
+subseq(T-_, _-T).
 
 % Glom together a person and day of the week into an atom
 job_key(Person,DayOfWeek,Key) :-
@@ -33,12 +33,12 @@ job_key(Person,DayOfWeek,Key) :-
 assign_jobs_int([],[], ADict, ADict).
 assign_jobs_int([CurJob|Js], [ass(CurJob,P)|As], ADict, ADictOut) :-
     CurJob = j(_, DayOfWeek, B),
-    %do_write(assign(CurJob,P)),
-    assign(CurJob,P),
+    do_write(assign(CurJob,P)),
+    %assign(CurJob,P),
     job_key(P,DayOfWeek,Key),
     append_to_dict(Key, B,  ADict,    ADictNew),
-    length(ADictNew.get(Key),NumShifts),
-    NumShifts =< 2,
+    %length(ADictNew.get(Key),NumShifts),
+    %NumShifts =< 2,
     not(bad_work(ADictNew.get(Key))),
     assign_jobs_int(Js, As, ADictNew, ADictOut).
 assign_jobs(Js,As) :-
@@ -46,11 +46,10 @@ assign_jobs(Js,As) :-
 
 day_to_string(N,S) :- nth1(N,["Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],S).
 
-assignment_to_string(ass(j(Jobname,DayOfWeek,Block), Person),AStr) :-
+assignment_to_string(ass(j(Jobname,DayOfWeek,S-E), Person),AStr) :-
     term_string(Jobname,JobStr),
     term_string(Person,PersonStr),
     day_to_string(DayOfWeek,DayStr),
-    block(S,E) = Block,
     term_string(S,StartStr),
     term_string(E,EndStr),
     string_concat("Assign ", PersonStr,S1),
@@ -68,8 +67,7 @@ comb2([X|T],[X|Comb]):-comb2(T,Comb).
 comb2([_|T],[X|Comb]):-comb2(T,[X|Comb]).
 
 bad_work(AGs) :-
-    comb2(AGs,[B1,B2]),
-    B1 = block(S1,E1),
-    B2 = block(S2,E2), %without the following line, any 2 shifts for one person in one day is "bad work"
-    (subseq(B1,B2) ; overlap(B1,B2)),!.
+    comb2(AGs,[S1-E1,S2-E2]),
+    %without the following line, any 2 shifts for one person in one day is "bad work"
+    (subseq(S1-E1,S2-E2) ; overlap(S1-E2,S2-E2)),!.
 

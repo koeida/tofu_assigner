@@ -1,67 +1,67 @@
 worker(
     christian, 
     [[],
-     [block(0,24)],
-     [block(13,18)],
-     [block(0,24)],
-     [block(0,24)],
-     [block(0,24)],
-     [block(0,24)]],
+     [0-24],
+     [13-18],
+     [0-24],
+     [0-24],
+     [0-24],
+     [0-24]],
     [trays1,trays2,trays3,trayscleanhonch,trayscleanhelp]).
 worker(
     brandy, 
-    [[block(7,12)],
+    [[7-12],
      [],
-     [block(4,5), block(10,12)],
-     [block(4,5), block(10,12)],
-     [block(4,5), block(10,12)],
-     [block(4,5), block(10,12)],
-     [block(4,5), block(10,12)]],
+     [4-5, 10-12],
+     [4-5, 10-12],
+     [4-5, 10-12],
+     [4-5, 10-12],
+     [4-5, 10-12]],
     [trays1,trays2,trays3,trayscleanhonch]).
 worker(
     brittany,
-    [[block(0,24)],
-     [block(8,12)],
-     [block(8,12)],
-     [block(8,12)],
-     [block(8,12)],
-     [block(8,12)],
-     [block(8,12)]],
+    [[0-24],
+     [8-12],
+     [8-12],
+     [8-12],
+     [8-12],
+     [8-12],
+     [8-12]],
     [packhonch1,packhonch2,packhonch3,packhonch4,packhelp1,packhelp2,packhelp3,packhelp4,packhelp2_1,packhelp2_2,trays1,trays2,trays3]).
 worker(
     becky,
-    [[block(12,16)],
-     [block(10,14)],
-     [block(10,14)],
-     [block(10,14)],
-     [block(10,14)],
-     [block(10,14)],
-     [block(10,14)]],
+    [[12-16],
+     [10-14],
+     [10-14],
+     [10-14],
+     [10-14],
+     [10-14],
+     [10-14]],
     [curd1,curd2]).
 worker(
     cj,
-    [[block(0,13)],
-     [block(4,5), block(7,9)],
-     [block(4,5), block(7,9)],
-     [block(4,5), block(7,9)],
-     [block(4,5), block(7,9)],
-     [block(4,5), block(7,9)],
-     [block(4,5), block(7,9)]],
+    [[0-13],
+     [4-5, 7-9],
+     [4-5, 7-9],
+     [4-5, 7-9],
+     [4-5, 7-9],
+     [4-5, 7-9],
+     [4-5, 7-9]],
     [packhonch1, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhonch, trayscleanhelp]).
 worker(
     claire,
-    [[block(0,24)],
-     [block(11,16)],
-     [block(11,16)],
-     [block(11,16)],
-     [block(11,16)],
-     [block(11,16)],
-     [block(11,16)]],
+    [[0-24],
+     [11-16],
+     [11-16],
+     [11-16],
+     [11-16],
+     [11-16],
+     [11-16]],
     [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
 
 worker(
     danjo,
-    [[block(0,13)],
+    [[0-13],
      [],
      [],
      [],
@@ -72,7 +72,7 @@ worker(
 
 worker(
     adder,
-    [[block(0,10),block(12.5,18)],
+    [[0-10,12.5-18],
      [],
      [],
      [],
@@ -83,13 +83,13 @@ worker(
 
 worker(
     arlo,
-    [[block(0,12)],
-     [block(11,12), block(14,15)],
-     [block(11,12), block(14,15)],
-     [block(11,12), block(14,15)],
-     [block(11,12), block(14,15)],
-     [block(11,12), block(14,15)],
-     [block(11,12), block(14,15)]],
+    [[0-12],
+     [11-12, 14-15],
+     [11-12, 14-15],
+     [11-12, 14-15],
+     [11-12, 14-15],
+     [11-12, 14-15],
+     [11-12, 14-15]],
     [ket1,ket2,ketcleanhonch,ketcleanhelp]).
 
 worker(
@@ -105,7 +105,7 @@ worker(
 
 worker(
     emily,
-    [[block(0,11)],
+    [[0-11],
      [],
      [],
      [],
@@ -116,7 +116,7 @@ worker(
 
 worker(
     ezra,
-    [[block(0,12)],
+    [[0-12],
      [],
      [],
      [],
@@ -126,7 +126,7 @@ worker(
     [trays1, trays2, trays3]).
 worker(
     fox,
-    [[block(0,11)],
+    [[0-11],
      [],
      [],
      [],
@@ -166,7 +166,7 @@ worker(
     [ket1, ket2, curd1, curd2]).
 worker(
     puck,
-    [[block(7,11)],
+    [[7-11],
      [],
      [],
      [],
@@ -177,7 +177,7 @@ worker(
 
 worker(
     tim,
-    [[block(15,18)],
+    [[15-18],
      [],
      [],
      [],
@@ -199,7 +199,7 @@ worker(
 
 worker(
     jen,
-    [[block(0,18)],
+    [[0-18],
      [],
      [],
      [],
@@ -221,7 +221,7 @@ worker(
 
 worker(
     scott,
-    [[block(0,9), block(12,24)],
+    [[0-9, 12-24],
      [],
      [],
      [],
@@ -243,7 +243,7 @@ worker(
 
 worker(
     mala,
-    [[block(0,12.5)],
+    [[0-12.5],
      [],
      [],
      [],
@@ -254,7 +254,7 @@ worker(
 
 worker(
     birddog,
-    [[block(7,11), block(16,24)],
+    [[7-11, 16-24],
      [],
      [],
      [],
@@ -265,7 +265,7 @@ worker(
 
 worker(
     anande,
-    [[block(18,24)],
+    [[18-24],
      [],
      [],
      [],
@@ -273,3 +273,14 @@ worker(
      [],
      []],
     [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
+
+worker(
+    testperson,
+    [[],
+     [],
+     [],
+     [],
+     [],
+     [],
+     []],
+    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
