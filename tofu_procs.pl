@@ -33,8 +33,8 @@ job_key(Person,DayOfWeek,Key) :-
 assign_jobs_int([],[], ADict, ADict).
 assign_jobs_int([CurJob|Js], [ass(CurJob,P)|As], ADict, ADictOut) :-
     CurJob = j(_, DayOfWeek, B),
-    do_write(assign(CurJob,P)),
-    %assign(CurJob,P),
+    %do_write(assign(CurJob,P)),
+    assign(CurJob,P),
     job_key(P,DayOfWeek,Key),
     append_to_dict(Key, B,  ADict,    ADictNew),
     %length(ADictNew.get(Key),NumShifts),
@@ -66,8 +66,34 @@ comb2(_,[]).
 comb2([X|T],[X|Comb]):-comb2(T,Comb).
 comb2([_|T],[X|Comb]):-comb2(T,[X|Comb]).
 
+list_workers([],[]).
+list_workers([ass(j(_,_,_),P)|As],[P|Ws]) :- list_workers(As,Ws).
+
+rating(As,Rating,Comments) :-
+    list_workers(As,Ws), list_to_set(Ws,UWs), length(UWs,NumWorkers), 
+    Worker_rating is NumWorkers * 10,
+    number_string(NumWorkers,UWStr), concat("Number of distinct workers: ",UWStr,Msg),
+    C1 = [Msg],
+    Comments = C1,
+
+    findall(_,comb2(As, [ass(j(_,Day,_), P), ass(j(_,Day,_), P)]), DoubleShifts),
+    length(DoubleShifts,DSs),
+    DSPenalty is DSs * -100, 
+    Rating is DSPenalty.
+
+rate_all([A:As],A) :-
+	rating(A,R,_),
+	R > 0,!.
+rate_all([A:As],Best) :-
+	rating(A,R,_),
+	rate_all(As,Best).
+
+best_day([],Max,R-A).
+best_day([R-A|Rs],Max,R-A) :- R > Max, best_day(Rs,Max,R).
+best_day([R-A|Rs],Max,Res) :- R =< Max, best_day(Rs,Max,Res).
+
 bad_work(AGs) :-
     comb2(AGs,[S1-E1,S2-E2]),
     %without the following line, any 2 shifts for one person in one day is "bad work"
-    (subseq(S1-E1,S2-E2) ; overlap(S1-E2,S2-E2)),!.
-
+    %(subseq(S1-E1,S2-E2) ; overlap(S1-E2,S2-E2)),!.
+    overlap(S1-E2,S2-E2),!.

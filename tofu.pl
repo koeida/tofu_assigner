@@ -2,7 +2,7 @@
 :- [tofu_procs].
 :- [workers].
 
-assign_test_day2(R,Ad) :- 
+test_day(R) :- 
     assign_jobs([
                  j(startup, 1, 6-10),
                  j(ket1, 1, 10-12.5),
@@ -27,6 +27,12 @@ assign_test_day2(R,Ad) :-
                  j(packhelp2_1, 1, 12.5-15.5),
                  j(packhelp2_2, 1, 15.5-18)
                 ],
-                R),
-    format("~n~n=======RESULTS=======~n~n",[]),
-    write_assignment_list(R).
+                R), 
+		rating(R,Rating,_),
+		format("~n*******************~n"),
+		write_assignment_list(R),
+		format("Rating: ~w~n", [Rating]),
+		format("~n*******************~n").
+
+get_best_day(_) :-
+	findall(_,test_day(Rs),_).
