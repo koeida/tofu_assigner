@@ -29,10 +29,9 @@ test_day(R) :-
                 ],
                 R), 
 		rating(R,Rating,_),
-		format("~n*******************~n"),
 		write_assignment_list(R),
 		format("Rating: ~w~n", [Rating]),
-		format("~n*******************~n").
+		format("~n*****~n", [Rating]).
 
 get_best_day(_) :-
 	findall(_,test_day(Rs),_).

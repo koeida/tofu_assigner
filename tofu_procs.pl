@@ -13,7 +13,7 @@ works_job(_,Jobs) :-
     member(any,Jobs).
 
 assign(j(JobName, Day, S-E), P) :- 
-    worker(P,Avails,Jobs),
+    worker(P,Avails,Jobs,_),
     nth1(Day,Avails, Avail),
     works_job(JobName,Jobs),
     available(Avail,S-E).
@@ -30,19 +30,21 @@ job_key(Person,DayOfWeek,Key) :-
     atom_string(Key,KeyS).
 
 % The actual tofu assigning code.
-assign_jobs_int([],[], ADict, ADict).
-assign_jobs_int([CurJob|Js], [ass(CurJob,P)|As], ADict, ADictOut) :-
+assign_jobs_int([],[], ADict, ADict, AllJobs).
+assign_jobs_int([CurJob|Js], [ass(CurJob,P)|As], ADict, ADictOut, Alljobs) :-
     CurJob = j(_, DayOfWeek, B),
     %do_write(assign(CurJob,P)),
     assign(CurJob,P),
     job_key(P,DayOfWeek,Key),
     append_to_dict(Key, B,  ADict,    ADictNew),
-    %length(ADictNew.get(Key),NumShifts),
-    %NumShifts =< 2,
+    append_to_dict(P, CurJob, Alljobs, AlljobsNew),
+    length(AlljobsNew.get(P),NumShifts),
+    worker(P,_,_,MaxShifts),
+    NumShifts =< MaxShifts,
     not(bad_work(ADictNew.get(Key))),
-    assign_jobs_int(Js, As, ADictNew, ADictOut).
+    assign_jobs_int(Js, As, ADictNew, ADictOut, AlljobsNew).
 assign_jobs(Js,As) :-
-    assign_jobs_int(Js, As, _{}, _).
+    assign_jobs_int(Js, As, _{}, _, _{}).
 
 day_to_string(N,S) :- nth1(N,["Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],S).
 
@@ -61,6 +63,20 @@ assignment_to_string(ass(j(Jobname,DayOfWeek,S-E), Person),AStr) :-
     string_concat(S6, DayStr, S7),
     string_concat(S7, " for job ", S8),
     string_concat(S8, JobStr, AStr).
+
+assignment_to_string2(ass(j(Jobname,DayOfWeek,S-E), Person),AStr) :-
+    term_string(Jobname,JobStr),
+    term_string(Person,PersonStr),
+    day_to_string(DayOfWeek,DayStr),
+    term_string(S,StartStr),
+    term_string(E,EndStr),
+    string_concat(JobStr, "\t", JobT),
+    string_concat(PersonStr, "\t", PersonT),
+    string_concat(StartStr, " to ", Range1),
+    string_concat(Range1, EndStr, RangeStr),
+    string_concat(RangeStr, "\t", RangeT),
+    string_concat(JobT,PersonT,JP),
+    string_concat(JP, RangeT,AStr).
 
 comb2(_,[]).
 comb2([X|T],[X|Comb]):-comb2(T,Comb).

@@ -7,7 +7,7 @@ worker(
      [0-24],
      [0-24],
      [0-24]],
-    [trays1,trays2,trays3,trayscleanhonch,trayscleanhelp]).
+    [trays1,trays2,trays3,trayscleanhonch,trayscleanhelp],1).
 worker(
     brandy, 
     [[7-12],
@@ -17,7 +17,7 @@ worker(
      [4-5, 10-12],
      [4-5, 10-12],
      [4-5, 10-12]],
-    [trays1,trays2,trays3,trayscleanhonch]).
+    [trays1,trays2,trays3,trayscleanhonch],1).
 worker(
     brittany,
     [[0-24],
@@ -27,7 +27,7 @@ worker(
      [8-12],
      [8-12],
      [8-12]],
-    [packhonch1,packhonch2,packhonch3,packhonch4,packhelp1,packhelp2,packhelp3,packhelp4,packhelp2_1,packhelp2_2,trays1,trays2,trays3]).
+    [packhonch1,packhonch2,packhonch3,packhonch4,packhelp1,packhelp2,packhelp3,packhelp4,packhelp2_1,packhelp2_2,trays1,trays2,trays3],1).
 worker(
     becky,
     [[12-16],
@@ -37,7 +37,7 @@ worker(
      [10-14],
      [10-14],
      [10-14]],
-    [curd1,curd2]).
+    [curd1,curd2],1).
 worker(
     cj,
     [[0-13],
@@ -47,7 +47,7 @@ worker(
      [4-5, 7-9],
      [4-5, 7-9],
      [4-5, 7-9]],
-    [packhonch1, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhonch, trayscleanhelp]).
+    [packhonch1, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhonch, trayscleanhelp],1).
 worker(
     claire,
     [[0-24],
@@ -57,7 +57,7 @@ worker(
      [11-16],
      [11-16],
      [11-16]],
-    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
+    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],1).
 
 worker(
     danjo,
@@ -68,7 +68,7 @@ worker(
      [],
      [],
      []],
-    [ketcleanhonch,ketcleanhelp]).
+    [ketcleanhonch,ketcleanhelp],1).
 
 worker(
     adder,
@@ -79,7 +79,7 @@ worker(
      [],
      [],
      []],
-    [ket1, ket2, ketcleanhonch, ketcleanhelp, curd1, curd2, trays1, trays2, trays3]).
+    [ket1, ket2, ketcleanhonch, ketcleanhelp, curd1, curd2, trays1, trays2, trays3],1).
 
 worker(
     arlo,
@@ -90,7 +90,7 @@ worker(
      [11-12, 14-15],
      [11-12, 14-15],
      [11-12, 14-15]],
-    [ket1,ket2,ketcleanhonch,ketcleanhelp]).
+    [ket1,ket2,ketcleanhonch,ketcleanhelp],1).
 
 worker(
     elijah,
@@ -101,7 +101,7 @@ worker(
      [],
      [],
      []],
-    [curd1, curd2, prep, meta]).
+    [curd1, curd2, prep, meta],1).
 
 worker(
     emily,
@@ -112,7 +112,7 @@ worker(
      [],
      [],
      []],
-    [trays1,trays2,trays3]).
+    [trays1,trays2,trays3],1).
 
 worker(
     ezra,
@@ -123,7 +123,7 @@ worker(
      [],
      [],
      []],
-    [trays1, trays2, trays3]).
+    [trays1, trays2, trays3],1).
 worker(
     fox,
     [[0-11],
@@ -133,7 +133,7 @@ worker(
      [],
      [],
      []],
-    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
+    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],1).
 worker(
     pax,
     [[],
@@ -143,7 +143,7 @@ worker(
      [],
      [],
      []],
-    [trays1, trays2, trays3, curd1, curd2]).
+    [trays1, trays2, trays3, curd1, curd2],1).
 worker(
     kami,
     [[],
@@ -153,7 +153,7 @@ worker(
      [],
      [],
      []],
-    [trays1,trays2,trays3, ket1, ket2, startup]).
+    [trays1,trays2,trays3, ket1, ket2, startup],1).
 worker(
     kete,
     [[],
@@ -163,7 +163,7 @@ worker(
      [],
      [],
      []],
-    [ket1, ket2, curd1, curd2]).
+    [ket1, ket2, curd1, curd2],1).
 worker(
     puck,
     [[7-11],
@@ -173,7 +173,7 @@ worker(
      [],
      [],
      []],
-    [ket1,ket2, curd1, curd2, trays1, trays2, trays3, trayscleanhelp, trayscleanhonch]).
+    [ket1,ket2, curd1, curd2, trays1, trays2, trays3, trayscleanhelp, trayscleanhonch],1).
 
 worker(
     tim,
@@ -184,7 +184,7 @@ worker(
      [],
      [],
      []],
-    [curd1, curd2]).
+    [curd1, curd2],1).
 
 worker(
     jeli,
@@ -195,7 +195,7 @@ worker(
      [],
      [],
      []],
-    [packhonch1, packhonch2, packhonch3, packhonch4]).
+    [packhonch1, packhonch2, packhonch3, packhonch4],1).
 
 worker(
     jen,
@@ -206,7 +206,7 @@ worker(
      [],
      [],
      []],
-    [packhonch1, packhelp1, packhelp2_1]).
+    [packhonch1, packhelp1, packhelp2_1],1).
 
 worker(
     rowan,
@@ -217,7 +217,7 @@ worker(
      [],
      [],
      []],
-    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
+    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],1).
 
 worker(
     scott,
@@ -228,7 +228,7 @@ worker(
      [],
      [],
      []],
-    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trays1, trays2, trays3]).
+    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trays1, trays2, trays3],1).
 
 worker(
     sansann,
@@ -239,7 +239,7 @@ worker(
      [],
      [],
      []],
-    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhelp, ketcleanhelp, ketcleanhonch]).
+    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhelp, ketcleanhelp, ketcleanhonch],1).
 
 worker(
     mala,
@@ -250,7 +250,7 @@ worker(
      [],
      [],
      []],
-    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhelp, trayscleanhonch]).
+    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhelp, trayscleanhonch],1).
 
 worker(
     birddog,
@@ -261,7 +261,7 @@ worker(
      [],
      [],
      []],
-    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhelp, ketcleanhelp]).
+    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2, trayscleanhelp, ketcleanhelp],1).
 
 worker(
     anande,
@@ -272,7 +272,7 @@ worker(
      [],
      [],
      []],
-    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
+    [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],1).
 
 worker(
     testperson,
@@ -283,4 +283,4 @@ worker(
      [],
      [],
      []],
-    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]).
+    [packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],1).
