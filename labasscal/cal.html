@@ -1,0 +1,194 @@
+<html>
+	<head>
+		<link rel='stylesheet' href='fullcalendar/fullcalendar.css'/>
+		<link rel='stylesheet' href='fullcalendar/scheduler.css'/>
+		<script src='workers.js'></script>
+		<script src='lib/jquery.min.js'></script>
+		<script src='lib/moment.min.js'></script>
+		<script src='lib/underscore-min.js'></script>
+		<script src='fullcalendar/fullcalendar.js'></script>
+		<script src='fullcalendar/scheduler.js'></script>
+		<script>
+			var sheets = [];
+			var sheetIndex = 0;
+
+			function initCalendar() {
+				// page is now ready, initialize the calendar...
+				$('#calendar').fullCalendar({
+					defaultDate: '2017-07-23',
+					defaultView: 'agendaWeek',
+					editable: true,
+					theme: true,
+					selectable: true,
+					selectHelper: true,
+					navLinks: false,
+					minTime: "06:00:00",
+					maxTime: "22:30:00",
+					select: function(start,end) {
+						eventdata = {
+							start:start,
+							end: end,
+							title: 'X',
+							id: gId++,
+						};
+						$('#calendar').fullCalendar('renderEvent', eventdata,true);
+						$('#calendar').fullCalendar('unselect');
+					},
+					dayNames: ['Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+					dayNamesShort: ['Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu'],
+					eventClick: function(calEvent, jsEvent, view) {
+						if (jsEvent.ctrlKey == true) {
+							$('#calendar').fullCalendar('removeEvents',[calEvent.id]);
+						}
+					},
+				});
+
+				if (localStorage.sheets != undefined && localStorage.sheets != "undefined") {
+					sheets = JSON.parse(localStorage.sheets);
+					loadCalendar(0);
+					updateSheetList();
+				}
+			}
+			function eventToProlog(e) {
+				start = moment(e.start);
+				end = moment(e.end);
+				startDay = start.day();
+				startTime = start.hour() + (start.minute() / 60); 
+				endTime = end.hour() + (end.minute() / 60); 
+				return [startDay, startTime + "-" + endTime];
+			}
+
+			function personToProlog(events) {
+				events = events.map(eventToProlog);
+				days = _.groupBy(events, function(e) { return e[0]; });
+				result = [];
+                for (x = 0; x < 7; x++) {
+                    if(days[x] == undefined) {
+                        result.push('[]');
+                    } else {
+                        spans = days[x].map(function(e) { return e[1];});
+                        result.push('[' + spans.join() + ']');
+                    }
+                }
+				return("[" + result.join() + "]");
+			}
+
+            function download(filename, text) {
+                  var element = document.createElement('a');
+                  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                  element.setAttribute('download', filename);
+
+                  element.style.display = 'none';
+                  document.body.appendChild(element);
+
+                  element.click();
+
+                  document.body.removeChild(element);
+                }
+
+			function convertToProlog() {
+				code = sheets.map(function(s){ 
+					jobs = "[]"
+					if (workers[s[0]] != undefined) {
+						jobs = workers[s[0]];
+					}
+					return "worker(\n" +
+						s[0] + ",\n" +
+						personToProlog(s[1]) + ",\n" +
+						jobs +
+						")";
+					}
+				).join("\n\n");
+                download("gen_workers.pl", code);
+			}
+
+			function changeSheet(n) {
+				curName = $('#memberName').val().trim();
+				events = $('#calendar').fullCalendar('clientEvents');
+
+				//if they click backward with no data set
+				if (curName == "" && events.length == 0 && n < 0) {
+					sheetIndex += n;
+					if(sheetIndex < 0) { sheetIndex = 0; }
+					loadCalendar(sheetIndex);
+					return;
+				}
+			
+				//if they click forward or backward and there's at least a name
+				if (curName != "") {
+					sheets[sheetIndex] = [curName, events];
+					localStorage.sheets = JSON.stringify(sheets.map(sheetToJson));
+					sheetIndex += n;
+					if(sheetIndex < 0) { sheetIndex = 0; }
+					loadCalendar(sheetIndex);
+					updateSheetList();
+				}
+			}
+
+			function sheetToJson(s) {
+				name = s[0];
+				es = s[1].map(function(e) {
+					res = {};
+					res['title'] = 'X';
+					res['start'] = e.start;
+					res['end'] = e.end;
+					return res});
+				return [name,es];
+			}
+
+			function updateSheetList() {
+				$("#sheetList").empty();
+				for(s in sheets) {
+					res = "<li><a href='#' onclick='loadCalendar(" + s + ");'>" + sheets[s][0] + "</a></li>\n";
+					$("#sheetList").append(res);
+				}
+			}
+
+			function loadCalendar(n) {
+				sheetIndex = n;
+				$('#calendar').fullCalendar('removeEventSources');
+				$('#memberName').val('');
+
+				if(sheets[n] != undefined) {
+					$('#calendar').fullCalendar('addEventSource', sheets[n][1]);
+					$('#memberName').val(sheets[n][0]);
+				}
+			}
+
+			gId = 0;
+			$(document).ready(function() {
+				initCalendar();
+			});
+		</script>
+		<style>
+			body{
+				margin: 40px 10px;
+				padding: 0;
+			}
+			#calendar {
+				max-width: 900px;
+				margin: 0 auto;
+			}
+			#bottomnav {
+				font-size: 24px;
+			}
+		</style>
+
+	</head>
+	<body>
+		<a href="#" onclick="reset_sheets();">Reset sheets</a>
+		<div id='calendar'></div>
+		<center>
+			<input type="text" id="memberName" name="memberName" />
+		<div id="bottomnav">
+			<a href="#" onclick="changeSheet(-1);">&#x2190;</a>|
+			<a href="#" onclick="convertToProlog();">Output to prolog</a> |
+			<a href="#" onclick="changeSheet(1);">&#x2192;</a>
+		</div>
+		</center>
+		<div>
+			<ul id="sheetList">
+			</ul>
+		</div>
+	</body>
+</html>
