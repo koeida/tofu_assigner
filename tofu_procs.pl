@@ -14,7 +14,7 @@ works_job(_,Jobs) :-
 
 assign(j(JobName, Day, S-E), P) :- 
     worker(P,Avails,Jobs,_),
-    nth1(Day,Avails, Avail),
+    nth1(Day, Avails, Avail),
     works_job(JobName,Jobs),
     available(Avail,S-E).
 
@@ -29,22 +29,33 @@ job_key(Person,DayOfWeek,Key) :-
     string_concat(PStr,DStr,KeyS),
     atom_string(Key,KeyS).
 
-% The actual tofu assigning code.
-assign_jobs_int([],[], ADict, ADict, Alljobs).
+assign_jobs_dict_housekeeping(P, CurJob, ADict,ADictNew,Alljobs,AlljobsNew,Key) :-
     CurJob = j(_, DayOfWeek, B),
-    %do_write(assign(CurJob,P)),
-    assign(CurJob,P),
-    %format("assigning: ~w to ~w~n",[CurJob,P]),
     job_key(P,DayOfWeek,Key),
     append_to_dict(Key, B,  ADict,    ADictNew),
-    append_to_dict(P, CurJob,  Alljobs, AlljobsNew),
-    length(AlljobsNew.get(P),NumShifts),
-    worker(P,_,_,MaxShifts),
-    %NumShifts =< MaxShifts,
-    not(bad_work(ADictNew.get(Key))),
+    append_to_dict(P, CurJob,  Alljobs, AlljobsNew).
+
+% The actual tofu assigning code.
+assign_jobs_int([],[], ADict, ADict, Alljobs).
+assign_jobs_int([CurJob|Js],[ass(CurJob,P)|As], ADict, ADict, Alljobs) :-
+    CurJob = j(_, DayOfWeek, B),
+    format("~w\t~w~n",[CurJob,P]),
+    assign(CurJob,P),
+    assign_jobs_dict_housekeeping(P, CurJob, ADict, ADictNew, Alljobs, AlljobsNew,Key),
+    not(bad_work(ADictNew.get(Key), AlljobsNew,P)),
     assign_jobs_int(Js, As, ADictNew, ADictOut,AlljobsNew).
 assign_jobs(Js,As) :-
+    not(jobs_unavailable(Js,UAs)),
     assign_jobs_int(Js, As, _{}, _,_{}).
+
+jobs_unavailable([CurJob|Js],[CurJob|UAs]) :-
+    CurJob = j(_, DayOfWeek, B),
+    findall(X,assign(CurJob,X),AllAssigns),
+    length(AllAssigns,LAss),
+    LAss == 0,
+    format("impossible to schedule: ~w~n",[CurJob]).
+jobs_unavailable([CurJob|Js],UAs) :-
+    jobs_unavailable(Js,UAs).
 
 day_to_string(N,S) :- nth1(N,["Friday", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],S).
 
@@ -108,8 +119,17 @@ best_day([],Max,R-A).
 best_day([R-A|Rs],Max,R-A) :- R > Max, best_day(Rs,Max,R).
 best_day([R-A|Rs],Max,Res) :- R =< Max, best_day(Rs,Max,Res).
 
-bad_work(AGs) :-
+bad_work(AGs,Alljobs,P) :-
     comb2(AGs,[S1-E1,S2-E2]),
     %without the following line, any 2 shifts for one person in one day is "bad work"
     %(subseq(S1-E1,S2-E2) ; overlap(S1-E2,S2-E2)),!.
-    overlap(S1-E2,S2-E2),!.
+    overlap(S1-E1,S2-E2),!.
+bad_work(AGs,Alljobs,P) :-
+    length(Alljobs.get(P), NumShifts),
+    worker(P,_,_,MaxShifts),
+    NumShifts > MaxShifts.
+
+overlapping_jobs(Js,Ol) :-
+   comb2(Js,[j(N,Day,B1), j(N2,Day,B2)]),
+   overlap(B1,B2),
+   Ol = [j(N,Day,B1), j(N2,Day,B2)].

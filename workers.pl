@@ -80,7 +80,7 @@ scott,
 
 worker(
 adder,
-[[6-21.5],[16-19,12-16,7-10],[12.5-16,19-22.5],[12-18],[19-22.5,9-12],[19-22.5,12.5-16],[19-22.5,12-16,6-10]],
+[[10-21.5],[16-19,12-16,7-10],[12.5-16,19-22.5],[12-18],[19-22.5,9-12],[19-22.5,12.5-16],[19-22.5,12-16,6-10]],
 [startup,ket1, ket2, ketcleanhonch, ketcleanhelp, curd1, curd2, trays1, trays2, trays3],3).
 
 worker(
@@ -192,3 +192,8 @@ worker(
 fox,
 [[6-11,15-16,18-22.5],[6-22.5],[6-12,18-22.5],[6-12,18-22.5],[6-12,18-22.5],[6-11,18-22.5],[6-15,18-22.5]],
 [packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],3).
+
+worker(
+packrobot,
+[[],[],[],[],[],[],[]],
+[packhonch1, packhonch2, packhonch3, packhonch4, packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2],3).
