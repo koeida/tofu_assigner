@@ -2,41 +2,30 @@
 :- use_module(library(apply)).
 :- use_module(library(clpfd)).
 :- [worker_db].
+:- [unavailable].
 
-
-worker_unavailable(anande,mon,12-16).
-worker_unavailable(anande,tue,12-16).
-worker_unavailable(anande,wed,12-16).
-worker_unavailable(anande,wed,17-23).
-
-worker_unavailable(clementine,fri,3.5-6.5).
-worker_unavailable(clementine,sat,4.5-22).
-worker_unavailable(clementine,sun,6-6.5).
-worker_unavailable(elijah,fri,8-14).
-worker_unavailable(elijah,sun,11.5-23).
-
-job(startup, startup, fri, 6-10).
-job(ket1, ket, fri, 10-12.5).
-job(ket2, ket, fri, 12.5-15.5).
-job(ketcleanhonch, ketclean, fri, 15.5-18).
-job(ketcleanhelp, ketcleanhelp, fri, 15.5-18).
-job(curd1, curd, fri, 7.5-11.5).
-job(curd2, curd, fri, 11.5-15.5).
-job(trays1, trays, fri, 8-11.5).
-job(trays2, trays, fri, 11.5-14.5).
-job(trays3, trays, fri, 14.5-17.5).
-job(trayscleanhelp, trayscleanhelp, fri, 17.5-19).
-job(trayscleanhonch, trayscleanhonch, fri, 17.5-19).
-job(packhonch1, packhonch, fri, 9-12).
-job(packhonch2, packhonch, fri, 12-16).
-job(packhonch3, packhonch, fri, 16-19).
-job(packhonch4, packhonch, fri, 19-22).
-job(packhelp1, packhelp, fri, 9.5-12.5).
-job(packhelp2, packhelp, fri, 12.5-15.5).
-job(packhelp3, packhelp, fri, 15.5-18).
-job(packhelp4, packhelp, fri, 18-20).
-job(packhelp2_1, packhelp, fri, 12.5-15.5).
-job(packhelp2_2, packhelp, fri, 15.5-18).
+job(startup, startup, mon, 6-10).
+job(ket1, ket, mon, 10-12.5).
+job(ket2, ket, mon, 12.5-15.5).
+job(ketcleanhonch, ketcleanhonch, mon, 15.5-18).
+job(ketcleanhelp, ketcleanhelp, mon, 15.5-18).
+job(curd1, curd, mon, 7.5-11.5).
+job(curd2, curd, mon, 11.5-15.5).
+job(trays1, trays, mon, 8-11.5).
+job(trays2, trays, mon, 11.5-14.5).
+job(trays3, trays, mon, 14.5-17.5).
+job(trayscleanhelp, trayscleanhelp, mon, 17.5-19).
+job(trayscleanhonch, trayscleanhonch, mon, 17.5-19).
+%job(packhonch1, packhonch, mon, 9-12).
+job(packhonch2, packhonch, mon, 12-16).
+job(packhonch3, packhonch, mon, 16-19).
+job(packhonch4, packhonch, mon, 19-22).
+job(packhelp1, packhelp, mon, 9.5-12.5).
+job(packhelp2, packhelp, mon, 12.5-15.5).
+job(packhelp3, packhelp, mon, 15.5-18).
+job(packhelp4, packhelp, mon, 18-20).
+job(packhelp2_1, packhelp, mon, 12.5-15.5).
+job(packhelp2_2, packhelp, mon, 15.5-18).
 
 
 comb2(_,[]).
@@ -53,8 +42,19 @@ overlapping(As,M,[A1,A2]) :-
 	comb2(As,[A1,A2]),
 	overlap(T1,T2).
 
-get_workers(Workers) :-
-	findall(worker(E),worker(E),Workers).
+missing_workers(Missing) :-
+	get_workers(Available),
+	findall(worker(E),worker(E),AllWorkers),
+	subtract(AllWorkers, Available, Missing).
+
+newfangled_workers(Newf) :-
+	get_workers(Available),
+	findall(worker(E),worker(E),AllWorkers),
+	subtract(Available, AllWorkers, Newf).
+
+get_workers(WSet) :-
+	findall(worker(E),worker_unavailable(E,_,_),Workers),
+	list_to_set(Workers,WSet).
 
 get_jobs(Jobs) :-
 	findall(job(JName,JSkill,JDay,JTime), job(JName,JSkill,JDay,JTime), Jobs).
@@ -77,6 +77,38 @@ assoc_key_var(Assoc, Key, Var) :- get_assoc(Key, Assoc, Var).
 list_or([L|Ls], Or) :- foldl(disjunction_, Ls, L, Or).
 disjunction_(A, B, B#\/A).
 
+output_schedule(Schedule,R) :-
+	writeln('Assignments = '),
+	format('Rating: ~w~n',[R]),
+	findall(_,(
+		member(assign(W,J),Schedule),
+		format('(~w,~w)~n',[W,J])
+	),_).
+
+go(Schedule) :-
+	findall(Schedule-R,
+		(schedule(Schedule),rating(Schedule,R), R >= -400, output_schedule(Schedule,R)),
+		Schedules),
+	length(Schedules,L),
+	L > 0.
+
+rating(Schedule,Rating) :-
+    findall(_,comb2(Schedule, [assign(P,job(_,_,Day,_)), assign(P,job(_,_,Day,_))]), DoubleShifts),
+    length(DoubleShifts,DSs),
+    DSPenalty is DSs * -100, 
+    Rating is DSPenalty.
+
+sheets() :-
+	missing_workers(Missing),
+	format("Missing Sheets:~n"),
+	format("~w~n",[Missing]),
+	format("~n"),
+
+	newfangled_workers(Newfangled),
+	format("Newfangled Workers:~n"),
+	format("~w~n",[Newfangled]),
+	format("~n").
+
 schedule(Schedule) :-
 	get_workers(Ws),
 	get_jobs(Js),
@@ -94,18 +126,20 @@ schedule(Schedule) :-
 		get_assoc(Assignment,Assoc,1)),
 		Assignments),
 
-	writeln('Assignments = '),
-	findall(_,(
-		member(assign(W,J),Assignments),
-		format('(~w,~w)~n',[W,J])
-	),_),
+	%writeln('Assignments = '),
+	%findall(_,(
+	%	member(assign(W,J),Assignments),
+	%	format('(~w,~w)~n',[W,J])
+	%),_),
 	Schedule = Assignments.
 
 constraints(Assoc, Es, Ts) :-
 	core_constraints(Assoc, Es, Ts),
 	skill_const(Assoc,Es,Ts),
 	no_overlap_const(Assoc),
-	max_shifts_const(Assoc,Es,Ts).
+	max_shifts_const(Assoc,Es,Ts),
+	worker_available_const(Assoc,Es,Ts),
+	no_subseq_const(Assoc).
 
 % core_constraints(+Assoc,+Employees,+Tasks)
 core_constraints(Assoc,Es,Ts) :-
@@ -149,7 +183,17 @@ max_shifts_sub(Assoc,Ts, W) :-
 		As),
 	assoc_keys_vars(Assoc,As,Vars),
 	sum(Vars, #=<, 3).
-	
+
+unfree(worker(E),job(_,_,Day,T)) :-
+	worker_unavailable(E,Day,T2),
+	overlap(T,T2).
+
+worker_available_const(Assoc,Es,Ts) :-
+	findall(assign(E,T),
+		(member(T,Ts), member(E,Es), unfree(E,T)),
+		As),
+	assoc_keys_vars(Assoc,As,Vars),
+	sum(Vars,#=,0).
 
 no_overlap_const(Assoc) :-
 	assignments(As),
@@ -161,5 +205,28 @@ no_overlap_const(Assoc) :-
 	maplist(no_overlap_sub(Assoc),OOFs).
 
 no_overlap_sub(Assoc,Os) :-
+	assoc_keys_vars(Assoc,Os,Vars),
+	sum(Vars,#=<,1).
+
+subseq(T1-T2,T2-T3).
+
+subseqs(As,M,[A1,A2]) :-
+	J1 = job(_,_,D,T1),
+	J2 = job(_,_,D,T2),
+	A1 = assign(M,J1),
+	A2 = assign(M,J2),
+	comb2(As,[A1,A2]),
+	subseq(T1,T2).
+
+no_subseq_const(Assoc) :-
+	assignments(As),
+	get_workers(Ws),
+	findall(Os,
+		bagof(O,Ws^As^(member(W,Ws),subseqs(As,W,O)),Os),
+		OOs),
+	append(OOs,OOFs),
+	maplist(no_overlap_sub(Assoc),OOFs).
+
+no_subseq_sub(Assoc,Os) :-
 	assoc_keys_vars(Assoc,Os,Vars),
 	sum(Vars,#=<,1).

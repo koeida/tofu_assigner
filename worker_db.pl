@@ -5,10 +5,11 @@ worker(becky).
 worker(birddog).
 worker(brandy).
 worker(brittany).
-worker(cell).
+worker(cel).
 worker(christian).
 worker(cj).
 worker(claire).
+worker(clementine).
 worker(daniel).
 worker(danjo).
 worker(elijah).
@@ -25,11 +26,11 @@ worker(kete).
 worker(lindsey).
 worker(madge).
 worker(mala).
-%worker(nina).
-%worker(paul).
-%worker(pax).
+worker(nina).
+worker(paul).
+worker(pax).
 worker(puck).
-%worker(reynaldo).
+worker(reynaldo).
 worker(rosie).
 worker(rowan).
 worker(sansann).
@@ -38,6 +39,17 @@ worker(sky).
 worker(stephan).
 worker(tigger).
 worker(tim).
+worker(trout).
+
+%visitors:
+worker(bobby).
+worker(crista).
+worker(dan).
+worker(danny).
+worker(erika).
+worker(koerner).
+worker(shreya).
+worker(ox).
 
 skill(curd).
 skill(ket).
@@ -49,6 +61,16 @@ skill(startup).
 skill(trays).
 skill(trayscleanhelp).
 skill(trayscleanhonch).
+
+% visitors
+worker_skill(erika,packhelp).
+worker_skill(bobby,packhelp).
+worker_skill(crista,packhelp).
+worker_skill(dan,packhelp).
+worker_skill(danny,packhelp).
+worker_skill(koerner,packhelp).
+worker_skill(ox,packhelp).
+worker_skill(shreya,packhelp).
 
 worker_skill(adder,ketcleanhonch).
 worker_skill(adder,ketcleanhelp).
@@ -76,9 +98,9 @@ worker_skill(brittany,packhonch).
 worker_skill(brittany,packhelp).
 worker_skill(brittany,trays).
 
-worker_skill(cell, packhelp).
-worker_skill(cell, trayscleanhonch).
-worker_skill(cell, trayscleanhelp).
+worker_skill(cel, packhelp).
+worker_skill(cel, trayscleanhonch).
+worker_skill(cel, trayscleanhelp).
 
 worker_skill(christian,trays).
 worker_skill(christian,trayscleanhonch).
@@ -93,6 +115,8 @@ worker_skill(cj,trayscleanhelp).
 worker_skill(claire,packhonch).
 worker_skill(claire,packhelp).
 
+worker_skill(clementine, packhelp).
+
 worker_skill(daniel,any).
 
 worker_skill(danjo,ketcleanhonch).
@@ -102,6 +126,8 @@ worker_skill(danjo,ketcleanhelp).
 worker_skill(elijah, curd).
 
 worker_skill(emily,trays).
+
+worker_skill(erika,packhelp).
 
 worker_skill(ezra, trays).
 
@@ -175,3 +201,5 @@ worker_skill(stephan,packhelp).
 worker_skill(tigger,trays).
 
 worker_skill(tim,curd).
+
+worker_skill(trout,ket).
