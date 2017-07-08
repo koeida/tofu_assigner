@@ -4,30 +4,6 @@
 :- [worker_db].
 :- [unavailable].
 
-job(startup, startup, mon, 6-10).
-job(ket1, ket, mon, 10-12.5).
-job(ket2, ket, mon, 12.5-15.5).
-job(ketcleanhonch, ketcleanhonch, mon, 15.5-18).
-job(ketcleanhelp, ketcleanhelp, mon, 15.5-18).
-job(curd1, curd, mon, 7.5-11.5).
-job(curd2, curd, mon, 11.5-15.5).
-job(trays1, trays, mon, 8-11.5).
-job(trays2, trays, mon, 11.5-14.5).
-job(trays3, trays, mon, 14.5-17.5).
-job(trayscleanhelp, trayscleanhelp, mon, 17.5-19).
-job(trayscleanhonch, trayscleanhonch, mon, 17.5-19).
-%job(packhonch1, packhonch, mon, 9-12).
-job(packhonch2, packhonch, mon, 12-16).
-job(packhonch3, packhonch, mon, 16-19).
-job(packhonch4, packhonch, mon, 19-22).
-job(packhelp1, packhelp, mon, 9.5-12.5).
-job(packhelp2, packhelp, mon, 12.5-15.5).
-job(packhelp3, packhelp, mon, 15.5-18).
-job(packhelp4, packhelp, mon, 18-20).
-job(packhelp2_1, packhelp, mon, 12.5-15.5).
-job(packhelp2_2, packhelp, mon, 15.5-18).
-
-
 comb2(_,[]).
 comb2([X|T],[X|Comb]):-comb2(T,Comb).
 comb2([_|T],[X|Comb]):-comb2(T,[X|Comb]).
@@ -61,7 +37,10 @@ get_jobs(Jobs) :-
 
 create_assoc_list(Es,Ts,Assoc) :-
 	empty_assoc(EmptyAssoc),
-	findall(assign(E,T), (member(E,Es), member(T,Ts)), AssignmentPairs),
+	findall(assign(E,T), 
+			(member(E,Es),
+			 member(T,Ts)),
+		AssignmentPairs),
 	build_assoc_list(EmptyAssoc, AssignmentPairs, Assoc).
 
 build_assoc_list(Assoc, [], Assoc).
@@ -79,15 +58,30 @@ disjunction_(A, B, B#\/A).
 
 output_schedule(Schedule,R) :-
 	writeln('Assignments = '),
-	format('Rating: ~w~n',[R]),
 	findall(_,(
 		member(assign(W,J),Schedule),
 		format('(~w,~w)~n',[W,J])
-	),_).
+	),_),
+	format('Rating: ~w~n',[R]).
 
-go(Schedule) :-
+curmax(-10000000).
+
+load_shifts(Option) :-
+	number_string(Option,Os),
+	string_concat("week",Os,S1),
+	string_concat(S1,".pl",S2),
+	consult(S2).
+
+go(Schedule,Option) :-
+	load_shifts(Option),
 	findall(Schedule-R,
-		(schedule(Schedule),rating(Schedule,R), R >= -400, output_schedule(Schedule,R)),
+		(schedule(Schedule,Option),
+			rating(Schedule,R),
+			curmax(CM),
+			R > CM,
+			abolish(curmax/1),
+			asserta(curmax(R)),
+			output_schedule(Schedule,R)),
 		Schedules),
 	length(Schedules,L),
 	L > 0.
@@ -96,7 +90,11 @@ rating(Schedule,Rating) :-
     findall(_,comb2(Schedule, [assign(P,job(_,_,Day,_)), assign(P,job(_,_,Day,_))]), DoubleShifts),
     length(DoubleShifts,DSs),
     DSPenalty is DSs * -100, 
-    Rating is DSPenalty.
+
+    findall(_,comb2(Schedule, [assign(P2,J), assign(P2,J2)]), WeeklyShifts),
+    length(WeeklyShifts,WSs),
+    WSPenalty is WSs * -25,
+    Rating is DSPenalty + WSPenalty.
 
 sheets() :-
 	missing_workers(Missing),
@@ -109,7 +107,8 @@ sheets() :-
 	format("~w~n",[Newfangled]),
 	format("~n").
 
-schedule(Schedule) :-
+schedule(Schedule,Option) :-
+	
 	get_workers(Ws),
 	get_jobs(Js),
 	
@@ -136,10 +135,12 @@ schedule(Schedule) :-
 constraints(Assoc, Es, Ts) :-
 	core_constraints(Assoc, Es, Ts),
 	skill_const(Assoc,Es,Ts),
-	no_overlap_const(Assoc),
+	%no_overlap_const(Assoc),
+	overlap_const(Assoc,Es,Ts),
 	max_shifts_const(Assoc,Es,Ts),
 	worker_available_const(Assoc,Es,Ts),
-	no_subseq_const(Assoc).
+	max_daily_const(Assoc,Es,Ts).
+	%no_subseq_const(Assoc).
 
 % core_constraints(+Assoc,+Employees,+Tasks)
 core_constraints(Assoc,Es,Ts) :-
@@ -172,7 +173,7 @@ skill_const(Assoc,Es,Ts) :-
 	        (member(W,Es),member(J,Ts), untrained(W,J)),
 		As),
 	assoc_keys_vars(Assoc,As,Vars),
-	sum(Vars,#=,0).
+	sum(Vars,#=,0) -> true ; (format("~w~n",[Vars]);fail).
 
 max_shifts_const(Assoc,Es,Ts) :-
 	maplist(max_shifts_sub(Assoc,Ts),Es).
@@ -182,7 +183,17 @@ max_shifts_sub(Assoc,Ts, W) :-
 	        member(J,Ts),
 		As),
 	assoc_keys_vars(Assoc,As,Vars),
-	sum(Vars, #=<, 3).
+	sum(Vars, #=<, 4).
+
+max_daily_const(Assoc,Es,Ts) :-
+	maplist(max_daily_sub(Assoc,Ts),Es).
+
+max_daily_sub(Assoc,Ts, W) :-
+	findall(assign(W,job(_,_,Day,_)), 
+	        member(job(_,_,Day_),Ts),
+		As),
+	assoc_keys_vars(Assoc,As,Vars),
+	sum(Vars, #=<, 2).
 
 unfree(worker(E),job(_,_,Day,T)) :-
 	worker_unavailable(E,Day,T2),
@@ -195,18 +206,18 @@ worker_available_const(Assoc,Es,Ts) :-
 	assoc_keys_vars(Assoc,As,Vars),
 	sum(Vars,#=,0).
 
-no_overlap_const(Assoc) :-
-	assignments(As),
-	get_workers(Ws),
-	findall(Os,
-		bagof(O,Ws^As^(member(W,Ws),overlapping(As,W,O)),Os),
-		OOs),
-	append(OOs,OOFs),
-	maplist(no_overlap_sub(Assoc),OOFs).
+overlapn(job(_,_,Day,T1),job(_,_,Day,T2)) :- overlap(T1,T2).
+consecn(job(_,_,Day,S1-E1), job(_,_,Day,E1-E2)).
 
-no_overlap_sub(Assoc,Os) :-
-	assoc_keys_vars(Assoc,Os,Vars),
-	sum(Vars,#=<,1).
+overlap_const(Assoc,Es,Ts) :-
+	findall(assign(E,T1)-assign(E,T2),
+		(member(E,Es),member(T1,Ts), member(T2,Ts), T1 \= T2, (overlapn(T1,T2) ; consecn(T1,T2))),
+		As),
+	maplist(overlap_const_sub(Assoc),As).
+
+overlap_const_sub(Assoc,A1-A2) :-
+	assoc_keys_vars(Assoc,[A1,A2],Vars),
+	sum(Vars, #=<, 1).
 
 subseq(T1-T2,T2-T3).
 
@@ -229,4 +240,4 @@ no_subseq_const(Assoc) :-
 
 no_subseq_sub(Assoc,Os) :-
 	assoc_keys_vars(Assoc,Os,Vars),
-	sum(Vars,#=<,1).
+	sum(Vars,#=,0).

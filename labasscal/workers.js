@@ -1,5 +1,10 @@
 workers={
 "adder": "[ket1, ket2, ketcleanhonch, ketcleanhelp, curd1, curd2, trays1, trays2, trays3]",
+worker_skill(adder,ket).
+worker_skill(adder,ketcleanhonch).
+worker_skill(adder,ketcleanhelp).
+worker_skill(adder,curd).
+worker_skill(adder,trays).
 "anande": "[packhelp1, packhelp2, packhelp3, packhelp4, packhelp2_1, packhelp2_2]",
 "arlo": "[ket1,ket2,ketcleanhonch,ketcleanhelp]",
 "becky": "[curd1,curd2]",
