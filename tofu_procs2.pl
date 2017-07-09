@@ -125,17 +125,11 @@ schedule(Schedule,Option) :-
 		get_assoc(Assignment,Assoc,1)),
 		Assignments),
 
-	%writeln('Assignments = '),
-	%findall(_,(
-	%	member(assign(W,J),Assignments),
-	%	format('(~w,~w)~n',[W,J])
-	%),_),
 	Schedule = Assignments.
 
 constraints(Assoc, Es, Ts) :-
 	core_constraints(Assoc, Es, Ts),
 	skill_const(Assoc,Es,Ts),
-	%no_overlap_const(Assoc),
 	overlap_const(Assoc,Es,Ts),
 	max_shifts_const(Assoc,Es,Ts),
 	worker_available_const(Assoc,Es,Ts),
@@ -236,7 +230,7 @@ no_subseq_const(Assoc) :-
 		bagof(O,Ws^As^(member(W,Ws),subseqs(As,W,O)),Os),
 		OOs),
 	append(OOs,OOFs),
-	maplist(no_overlap_sub(Assoc),OOFs).
+	maplist(no_subseq_sub(Assoc),OOFs).
 
 no_subseq_sub(Assoc,Os) :-
 	assoc_keys_vars(Assoc,Os,Vars),

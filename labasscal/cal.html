@@ -11,10 +11,15 @@
 		<script>
 			var sheets = [];
 			var sheetIndex = 0;
+			var gId = 0;
 
 			function initCalendar() {
+				var calHeight = 1000;
+
 				// page is now ready, initialize the calendar...
 				$('#calendar').fullCalendar({
+					height: calHeight,
+					contentHeight: calHeight,
 					defaultDate: '2017-07-23',
 					defaultView: 'agendaWeek',
 					editable: true,
@@ -24,20 +29,43 @@
 					navLinks: false,
 					minTime: "06:00:00",
 					maxTime: "22:30:00",
-					select: function(start,end) {
-						eventdata = {
-							start:start,
-							end: end,
-							title: 'X',
-							id: gId++,
-						};
-						$('#calendar').fullCalendar('renderEvent', eventdata,true);
+					select: function(start, end, jsEvent) {
+						if (jsEvent.ctrlKey) {
+							s1 = moment(start);
+							s1.hour(6);
+							s1.minute(0);
+							e2 = moment(end);
+							e2.hour(22);
+							e2.minute(0);
+							event1 = {
+								start:s1,
+								end:start,
+								title:'X',
+								id: gId++,
+							};
+							event2 = {
+								start:end,
+								end:e2,
+								title:'X',
+								id: gId++,
+							};
+							$('#calendar').fullCalendar('renderEvent', event1,true);
+							$('#calendar').fullCalendar('renderEvent', event2,true);
+						} else {
+							eventdata = {
+								start:start,
+								end: end,
+								title: 'X',
+								id: gId++,
+							};
+							$('#calendar').fullCalendar('renderEvent', eventdata,true);
+						}
 						$('#calendar').fullCalendar('unselect');
 					},
 					dayNames: ['Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
 					dayNamesShort: ['Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu'],
 					eventClick: function(calEvent, jsEvent, view) {
-						if (jsEvent.ctrlKey == true) {
+						if (jsEvent.ctrlKey) {
 							$('#calendar').fullCalendar('removeEvents',[calEvent.id]);
 						}
 					},
@@ -58,19 +86,23 @@
 				return [startDay, startTime + "-" + endTime];
 			}
 
-			function personToProlog(events) {
+			function personToProlog(name, events) {
+				daynames = ["fri","sat","sun","mon","tue","wed","thu"];
 				events = events.map(eventToProlog);
 				days = _.groupBy(events, function(e) { return e[0]; });
-				result = [];
-                for (x = 0; x < 7; x++) {
-                    if(days[x] == undefined) {
-                        result.push('[]');
-                    } else {
-                        spans = days[x].map(function(e) { return e[1];});
-                        result.push('[' + spans.join() + ']');
-                    }
-                }
-				return("[" + result.join() + "]");
+				result = "";
+				for (x = 0; x < 7; x++) {
+				    if(days[x] != undefined) {
+					spans = days[x].map(function(e) { return e[1];});
+					spans = spans.map(function(s) {
+						return "worker_unavailable(" + 
+							name + "," + 
+							daynames[x] + "," +
+							s + ").\n";});
+					result += spans.join("");
+				    }
+				}
+				return result;
 			}
 
             function download(filename, text) {
@@ -88,17 +120,9 @@
 
 			function convertToProlog() {
 				code = sheets.map(function(s){ 
-					jobs = "[]"
-					if (workers[s[0]] != undefined) {
-						jobs = workers[s[0]];
+					return personToProlog(s[0],s[1]);
 					}
-					return "worker(\n" +
-						s[0] + ",\n" +
-						personToProlog(s[1]) + ",\n" +
-						jobs +
-						")";
-					}
-				).join("\n\n");
+				).join("");
                 download("gen_workers.pl", code);
 			}
 
@@ -132,6 +156,7 @@
 					res['title'] = 'X';
 					res['start'] = e.start;
 					res['end'] = e.end;
+					res['id'] = e.id;
 					return res});
 				return [name,es];
 			}
@@ -150,12 +175,15 @@
 				$('#memberName').val('');
 
 				if(sheets[n] != undefined) {
+					gId = _.max(sheets[n][1], function(s) { return s.id; }).id + 1;
 					$('#calendar').fullCalendar('addEventSource', sheets[n][1]);
 					$('#memberName').val(sheets[n][0]);
+				} else {
+					gId = 0;
 				}
 			}
 
-			gId = 0;
+
 			$(document).ready(function() {
 				initCalendar();
 			});
@@ -168,16 +196,20 @@
 			#calendar {
 				max-width: 900px;
 				margin: 0 auto;
+				height: 800px;
 			}
 			#bottomnav {
 				font-size: 24px;
+			}
+
+			.fc-scroller {
+				overflow-y: hidden !important;
 			}
 		</style>
 
 	</head>
 	<body>
 		<a href="#" onclick="reset_sheets();">Reset sheets</a>
-		<div id='calendar'></div>
 		<center>
 			<input type="text" id="memberName" name="memberName" />
 		<div id="bottomnav">
@@ -190,5 +222,6 @@
 			<ul id="sheetList">
 			</ul>
 		</div>
+		<div id='calendar'></div>
 	</body>
 </html>
