@@ -11,10 +11,10 @@ num_to_day(Num,Day) :-
 schedule_day(0,DayOfWeekNum,[]).
 schedule_day(1,DayOfWeekNum,Res) :-
 	num_to_day(DayOfWeekNum,Day),
-	normal_day(num_to_day,Res).
+	normal_day(Day,Res).
 schedule_day(2,DayOfWeekNum,Res) :-
 	num_to_day(DayOfWeekNum,Day),
-	pounder_day(num_to_day,Res).
+	pounder_day(Day,Res).
 
 schedule_days([],[],_).
 schedule_days([T|Ts],[S|Ss],N) :-
@@ -81,5 +81,6 @@ pounder_day(Day,Result) :-
 	].
 
 schedules(NumDays, Result) :-
-	valid_schedule(NumDays, Schedule),
-	schedule_days(Schedule,Result,0).
+	valid_schedule(NumDays, ScheduleDays),
+	schedule_days(ScheduleDays, Schedule, 0),
+	flatten(Schedule,Result).
