@@ -25,6 +25,8 @@ schedule_days([T|Ts],[S|Ss],N) :-
 valid_schedule(NumDays, Result) :-
 	Days = [Fri,Sat,Sun,Mon,Tue,Wed,Thu],
 	Days ins 0..2,
+	Sat #= 0,
+	Wed #= 0,
 	PounderDays #= 1,
 	RegularDays #= NumDays - 1,
 	num_matching(Days, 2, PounderDays),

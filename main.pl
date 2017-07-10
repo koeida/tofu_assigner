@@ -74,7 +74,6 @@ constraints(Assoc, Es, Ts) :-
 	max_shifts_const(Assoc,Es,Ts),
 	worker_available_const(Assoc,Es,Ts),
 	max_daily_const(Assoc,Es,Ts).
-	%no_subseq_const(Assoc).
 
 % core_constraints(+Assoc,+Employees,+Tasks)
 core_constraints(Assoc,Es,Ts) :-
@@ -88,9 +87,7 @@ core_constraints_disj(Assoc,Es,T) :-
     assoc_keys_vars(Assoc,Keys,Vars),
     sum(Vars,#=,1).
 
-assignments(As) :- 
-	get_workers(Ws),
-	get_jobs(Js),
+assignments(Ws,Js,As) :- 
 	findall(assign(W,J), 
 	        (member(W,Ws),member(J,Js)),
 		As).
@@ -104,7 +101,7 @@ skill_const(Assoc,Es,Ts) :-
 	        (member(W,Es),member(J,Ts), untrained(W,J)),
 		As),
 	assoc_keys_vars(Assoc,As,Vars),
-	sum(Vars,#=,0) -> true ; (format("~w~n",[Vars]);fail).
+	sum(Vars,#=,0).
 
 max_shifts_const(Assoc,Es,Ts) :-
 	maplist(max_shifts_sub(Assoc,Ts),Es).
@@ -114,17 +111,17 @@ max_shifts_sub(Assoc,Ts, W) :-
 	        member(J,Ts),
 		As),
 	assoc_keys_vars(Assoc,As,Vars),
-	sum(Vars, #=<, 4).
+	sum(Vars, #=<, 3).
 
 max_daily_const(Assoc,Es,Ts) :-
 	maplist(max_daily_sub(Assoc,Ts),Es).
 
 max_daily_sub(Assoc,Ts, W) :-
-	findall(assign(W,job(_,_,Day,_)), 
-	        member(job(_,_,Day_),Ts),
+	findall(assign(W,job(N1,Sk1,Day,Time1)), 
+	        member(job(N1,Sk1,Day,Time1),Ts),
 		As),
 	assoc_keys_vars(Assoc,As,Vars),
-	sum(Vars, #=<, 2).
+	sum(Vars, #=<, 3).
 
 unfree(worker(E),job(_,_,Day,T)) :-
 	worker_unavailable(E,Day,T2),
@@ -137,7 +134,6 @@ worker_available_const(Assoc,Es,Ts) :-
 	assoc_keys_vars(Assoc,As,Vars),
 	sum(Vars,#=,0).
 
-
 consecn(job(_,_,Day,S1-E1), job(_,_,Day,E1-E2)).
 
 overlap_const(Assoc,Es,Ts) :-
@@ -149,19 +145,6 @@ overlap_const(Assoc,Es,Ts) :-
 overlap_const_sub(Assoc,A1-A2) :-
 	assoc_keys_vars(Assoc,[A1,A2],Vars),
 	sum(Vars, #=<, 1).
-
-no_subseq_const(Assoc) :-
-	assignments(As),
-	get_workers(Ws),
-	findall(Os,
-		bagof(O,Ws^As^(member(W,Ws),subseqs(As,W,O)),Os),
-		OOs),
-	append(OOs,OOFs),
-	maplist(no_subseq_sub(Assoc),OOFs).
-
-no_subseq_sub(Assoc,Os) :-
-	assoc_keys_vars(Assoc,Os,Vars),
-	sum(Vars,#=,0).
 
 % MAIN 
 
@@ -183,8 +166,11 @@ get_workers(WSet) :-
 	findall(worker(E),worker_unavailable(E,_,_),Workers),
 	list_to_set(Workers,WSet).
 
-get_jobs(Jobs) :-
-	findall(job(JName,JSkill,JDay,JTime), job(JName,JSkill,JDay,JTime), Jobs).
+get_jobs(DBId,Jobs) :-
+	findall(
+		job(JName,JSkill,JDay,JTime), 
+		recorded(DBId, job(JName,JSkill,JDay,JTime),_),
+		Jobs).
 
 output_schedule(Schedule,R) :-
 	writeln('Assignments = '),
@@ -201,18 +187,20 @@ load_shifts(Option) :-
 	consult(S2).
 
 rating(Schedule,Rating) :-
-    findall(_,comb2(Schedule, [assign(P,job(_,_,Day,_)), assign(P,job(_,_,Day,_))]), DoubleShifts),
-    length(DoubleShifts,DSs),
-    DSPenalty is DSs * -100, 
+	findall(_,comb2(Schedule, [assign(P,job(_,_,Day,_)), assign(P,job(_,_,Day,_))]), DoubleShifts),
+	length(DoubleShifts,DSs),
+	DSPenalty is DSs * -100, 
 
-    findall(_,comb2(Schedule, [assign(P2,J), assign(P2,J2)]), WeeklyShifts),
-    length(WeeklyShifts,WSs),
-    WSPenalty is WSs * -25,
-    Rating is DSPenalty + WSPenalty.
+	findall(_,comb2(Schedule, [assign(P2,J), assign(P2,J2)]), WeeklyShifts),
+	length(WeeklyShifts,WSs),
+	WSPenalty is WSs * -25,
 
-schedule(Schedule) :-
+	Rating is DSPenalty + WSPenalty.
+
+
+schedule(DBId, Schedule) :-
 	get_workers(Ws),
-	get_jobs(Js),
+	get_jobs(DBId, Js),
 	
 	%Assoc contains every possible assignment as a key
 	create_assoc_list(Ws,Js,Assoc),
@@ -229,38 +217,55 @@ schedule(Schedule) :-
 
 	Schedule = Assignments.
 
-test_day(Day,Finish) :-
+
+test_day(Day,Schedule) :-
 	schedules(Day, Schedule),
 	format("."),
 	flush_output,
-	abolish(job/4),
-	maplist(assert,Schedule),
-	schedule(_),
-	format("~n~w days is schedulable.~n", [Day]),
-	Finish = 1.
+	gensym(Day,DBId),
+	maplist(recorda(DBId),Schedule),
+	schedule(DBId,_) -> (format("~n~w day(s) is schedulable.~n", [Day]), Finish = 1) 
+			  ; (format("~nCannot schedule ~w day(s).~n",[Day]), Finish = 1). 
 
-max_days() :-
-	test_day(1,F1),
-	test_day(2,F2),
-	test_day(3,F3),
-	test_day(4,F4),
-	test_day(5,F5),
+max_days_parallel() :-
+	spawn(ignore(test_day(1,_))),
+	spawn(ignore(test_day(2,_))),
+	spawn(ignore(test_day(3,_))),
+	spawn(ignore(test_day(4,_))),
+	spawn(ignore(test_day(5,F5))),
+	await(F5),
 	format("~nDONE~n").
 
+max_days() :-
+	test_day(1,R1),
+	format("~n~nJOBS 1~n~n"),
+	format("~w~n~n",[R1]),
+	test_day(2,R2),
+	format("~n~nJOBS 2~n~n"),
+	format("~w~n~n",[R2]),
+	test_day(3,R3),
+	format("~n~nJOBS 3~n~n"),
+	format("~w~n~n",[R3]),
+	test_day(4,R4),
+	format("~n~nJOBS 4~n~n"),
+	format("~w~n~n",[R4]),
+	test_day(5,R5),
+	format("~n~nJOBS 5~n~n"),
+	format("~w~n~n",[R5]),
+	format("~nDONE~n").
 
 curmax(-10000000).
 
-go(Schedule,Option) :-
-	load_shifts(Option),
+go() :-
+	Shifts = [job(startup,startup,mon,6-10),job(ket1,ket,mon,10-12.5),job(ket2,ket,mon,12.5-15.5),job(ketcleanhonch,ketcleanhonch,mon,15.5-18),job(ketcleanhelp,ketcleanhelp,mon,15.5-18),job(curd1,curd,mon,7.5-11.5),job(curd2,curd,mon,11.5-15.5),job(trays1,trays,mon,8-11.5),job(trays2,trays,mon,11.5-14.5),job(trays3,trays,mon,14.5-17.5),job(trayscleanhelp,trayscleanhelp,mon,17.5-18.5),job(trayscleanhonch,trayscleanhonch,mon,17.5-18.5),job(packhonch1,packhonch,mon,9-12),job(packhonch2,packhonch,mon,12-16),job(packhonch3,packhonch,mon,16-19),job(packhonch4,packhonch,mon,19-22),job(packhelp1,packhelp,mon,9.5-12.5),job(packhelp2,packhelp,mon,12.5-15.5),job(packhelp3,packhelp,mon,15.5-18),job(packhelp4,packhelp,mon,18-20),job(packhelp2_1,packhelp,mon,12.5-15.5),job(packhelp2_2,packhelp,mon,15.5-18)],
+	maplist(recorda(foofoo),Shifts),
 	sheet_check,
 	findall(Schedule-R,
-		(schedule(Schedule),
+		(schedule(foofoo,Schedule),
 			rating(Schedule,R),
 			curmax(CM),
-			R > CM,
+			R >= CM,
 			abolish(curmax/1),
 			asserta(curmax(R)),
 			output_schedule(Schedule,R)),
-		Schedules),
-	length(Schedules,L),
-	L > 0.
+		Schedules).
