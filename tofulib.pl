@@ -161,8 +161,14 @@ consecn(job(_,_,Day,_-E1), job(_,_,Day,E1-_)).
 
 overlap_const(Assoc,Es,Ts) :-
     findall(assign(E,T1)-assign(E,T2),
-        (member(E,Es),member(T1,Ts), member(T2,Ts), T1 \= T2, (job_overlap(T1,T2) ; consecn(T1,T2))),
-        As),
+            (
+                member(E,Es),
+                member(T1,Ts),
+                member(T2,Ts),
+                T1 \= T2,
+                (job_overlap(T1,T2) ; consecn(T1,T2))
+            ),
+            As),
     maplist(overlap_const_sub(Assoc),As).
 
 overlap_const_sub(Assoc,A1-A2) :-
