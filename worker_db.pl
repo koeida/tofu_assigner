@@ -37,6 +37,7 @@ worker(sansann).
 worker(scott).
 worker(sky).
 worker(stephan).
+worker(sunya).
 worker(tigger).
 worker(tim).
 worker(trout).
@@ -61,6 +62,54 @@ skill(startup).
 skill(trays).
 skill(trayscleanhelp).
 skill(trayscleanhonch).
+
+% worker_skill_max(WorkerName, Skill, MaxNum)
+% How many shifts a given worker wants for work 
+% falling under this particular skill per week.
+worker_skill_max(arlo, ket, 2).
+worker_skill_max(arlo, ketcleanhonch, 2).
+worker_skill_max(birddog, packhelp, 2).
+worker_skill_max(birddog, trayscleanhelp, 2).
+worker_skill_max(elijah, curd, 4).
+
+% worker_max(WorkerName, MaxNum)
+% How many shifts a given worke wants in total
+% per week.
+worker_max(adder,6).
+worker_max(becky,3).
+worker_max(brandy,4).
+worker_max(birddog,2).
+worker_max(cel,3).
+worker_max(christian,2).
+worker_max(cj,4).
+worker_max(claire,3).
+worker_max(danjo,3).
+worker_max(daniel,10).
+worker_max(emily, 3).
+worker_max(ezra, 2).
+worker_max(fox,2).
+worker_max(jeli, 5).
+worker_max(jen, 2).
+worker_max(kami,4).
+worker_max(kera,3).
+worker_max(kete, 4).
+worker_max(lindsey,2).
+worker_max(madge,1).
+worker_max(mala, 2).
+worker_max(paul,4).
+worker_max(pax,3).
+worker_max(puck,4).
+worker_max(reynaldo,3).
+worker_max(rosie,2).
+worker_max(sansann,4).
+worker_max(scott,3).
+worker_max(sky,3).
+worker_max(stephan,2).
+worker_max(sunya,3).
+worker_max(tim,2).
+worker_max(trout,5).
+worker_max(johnny,3).
+worker_max(rowan,3).
 
 % visitors
 worker_skill(erika,packhelp).
