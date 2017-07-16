@@ -80,11 +80,11 @@ print_list([X|Xs]) :- format("~w~n",[X]), print_list(Xs).
 
 constraints(Assoc, Es, Ts) :-
     core_constraints(Assoc, Es, Ts),
-    skill_const(Assoc,Es,Ts),
-    overlap_const(Assoc,Es,Ts),
-    max_shifts_const(Assoc,Es,Ts),
     worker_available_const(Assoc,Es,Ts),
+    overlap_const(Assoc,Es,Ts),
+    skill_const(Assoc,Es,Ts),
     max_daily_const(Assoc,Es,Ts),
+    max_shifts_const(Assoc,Es,Ts),
     max_per_skill_const(Assoc,Es,Ts).
 
 % core_constraints(+Assoc,+Employees,+Tasks)
@@ -105,7 +105,6 @@ assignments(Ws,Js,As) :-
         As).
 
 untrained(worker(Worker),job(_,Skill,_,_)) :-
-    findall(S,worker_skill(Worker,S),SS),
     not(worker_skill(Worker,Skill) ; worker_skill(Worker,any)).
 
 skill_const(Assoc,Es,Ts) :-
@@ -158,7 +157,7 @@ worker_available_const(Assoc,Es,Ts) :-
     assoc_keys_vars(Assoc,As,Vars),
     sum(Vars,#=,0).
 
-consecn(job(_,_,Day,S1-E1), job(_,_,Day,E1-E2)).
+consecn(job(_,_,Day,_-E1), job(_,_,Day,E1-_)).
 
 overlap_const(Assoc,Es,Ts) :-
     findall(assign(E,T1)-assign(E,T2),

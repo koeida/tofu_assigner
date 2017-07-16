@@ -33,7 +33,24 @@ runshifts(Shifts,Schedule) :-
     maplist(recorda(DBId),Shifts),
     schedule(DBId,Schedule).
 
-:- begin_tests(tofu).
+:- begin_tests(misc).
+
+test(consecutive_fail, [fail]) :-
+    consecn(job(Arlo,packhelp,mon,10-11), job(Arlo,packhelp,mon,12-14)).
+
+test(consecutive) :-
+    consecn(job(Arlo,packhelp,mon,10-12), job(Arlo,packhelp,mon,12-14)).
+
+:- end_tests(misc).
+
+:- begin_tests(constraints).
+
+% Fails because Arlo doesn't have the packhonch skill
+test(skill_fail, [setup(make_tmpdb),cleanup(unmake_tmpdb),nondet,fail]) :-
+    Shifts = [
+              job(p,packhonch,mon,7-14)
+             ],
+    runshifts(Shifts,_).
 
 % Fails because it violates the availability constraint, i.e: Arlo is 
 % unavailable Tuesday 10-12, so this shift can't be filled. 
@@ -86,5 +103,5 @@ test(max_per_skill2, [setup(make_tmpdb),cleanup(unmake_tmpdb),nondet]) :-
              ],
     runshifts(Shifts,_).
 
-:- end_tests(tofu).
+:- end_tests(constraints).
 
