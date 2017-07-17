@@ -4,9 +4,9 @@
 :- [unavailable].
 :- [shifts].
 
-valid_days(5).
-valid_days(4).
-valid_days(3).
+%valid_days(5).
+%valid_days(4).
+%valid_days(3).
 valid_days(2).
 
 go() :-
@@ -25,6 +25,9 @@ gen_sched(Out,Removed,NumDays) :-
 	maplist(recorda(Tess),Shifts),
         format("=====New Attempt=====~n"),
         once(schedule(Tess,Schedule)),
+        last(Removed,UnfillableJob),
+        backfill(UnfillableJob,Shifts),
+        %trace,
         assert(fillable_schedule(Schedule,Removed)),
         output_schedule(Schedule,0),
         Out = Schedule.

@@ -30,6 +30,7 @@ valid_schedule(NumDays, Result) :-
 	Days ins 0..3,
 	Sat #= 0,
 	Wed #= 0,
+        Fri #= 0,
 	PounderDays #= 1,
         BulkDays #= 1,
 	RegularDays #= NumDays - 2,
@@ -113,6 +114,45 @@ pounder_day(Day, [
             job(packhelp2_2, packhelp, Day, 15.5-18)
 	]).
 
+msubset([], []).
+msubset([E|Tail], [E|NTail]) :-
+  msubset(Tail, NTail).
+msubset([_|Tail], NTail) :-
+  msubset(Tail, NTail).
+
+writelist([]).
+writelist([X|Xs]) :- write(X),nl,writelist(Xs).
+
+backfill(UnfillableJob,Sched) :-
+    delete(Sched,job(UnfillableJob,_,_,_),Shifts),
+    gensym(tess,Tess),
+    maplist(recorda(Tess),Shifts),
+    once(schedule(Tess,Result)),
+    output_schedule(Result,0),
+    trace.
+
+
+removable_jobs([
+        packhelp2_1,
+        packhelp2_2,
+        trayscleanhelp,
+        ketcleanhelp,
+        packhelp1,
+        packhelp2,
+        packhelp3,
+        packhelp4,
+        packhonch4,
+        packhonch3,
+        packhonch2,
+        trays3,
+        curd2,
+        ket2,
+        ket1,
+        startup,
+        trays2,
+        trays1
+        ]).
+
 % pick_jobs(+Jobs,-Removed,-Result)
 pick_jobs(Jobs,JobsToRemove,Result) :-
     RemovableJobs = [
@@ -120,10 +160,10 @@ pick_jobs(Jobs,JobsToRemove,Result) :-
         packhelp2_2,
         trayscleanhelp,
         ketcleanhelp,
-        packhelp3,
-        packhelp4,
         packhelp1,
         packhelp2,
+        packhelp3,
+        packhelp4,
         packhonch4,
         packhonch3,
         packhonch2,
