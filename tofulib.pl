@@ -264,6 +264,4 @@ schedule(DBId, Schedule) :-
 
     Schedule = Assignments.
 
-
-
 curmax(-10000000).

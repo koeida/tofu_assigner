@@ -4,13 +4,16 @@
 :- [unavailable].
 :- [shifts].
 
-%valid_days(5).
+valid_days(5).
 valid_days(4).
 valid_days(3).
 valid_days(2).
 
 go() :-
-    %sheet_check,
+    sheet_check,
+    findall(sched(S,R,Days),gen_sched(S,R,Days),Scheds),
+    qsave_program("schedule_output.pls").
+gen_sched(Out,Removed,NumDays) :-
         valid_days(NumDays),
         format("~n======ATTEMPTING ~w DAYS======~n",[NumDays]),
         valid_schedule(NumDays,S1),
@@ -21,9 +24,10 @@ go() :-
         gensym(tess,Tess),
 	maplist(recorda(Tess),Shifts),
         format("=====New Attempt=====~n"),
-        schedule(Tess,Schedule),
+        once(schedule(Tess,Schedule)),
         assert(fillable_schedule(Schedule,Removed)),
-        output_schedule(Schedule,0).
+        output_schedule(Schedule,0),
+        Out = Schedule.
     %findall(Schedule-R,
     %            (
                     %schedule(foofoo,Schedule),
