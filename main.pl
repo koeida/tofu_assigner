@@ -1,22 +1,28 @@
+:- use_module(library(clpfd)).
 :- [tofulib].
 :- [worker_db].
 :- [unavailable].
 :- [shifts].
 
+%valid_days(5).
+valid_days(4).
+valid_days(3).
+valid_days(2).
+
 go() :-
-	sheet_check,
-        normal_day(fri,D1),
-        normal_day(sat,D2),
-        normal_day(sun,D3),
-        normal_day(mon,D4),
-        normal_day(tue,D5),
-        normal_day(thu,D6),
-        flatten([D4,D3],S1),
-        pick_jobs(S1,Shifts),
+    %sheet_check,
+        valid_days(NumDays),
+        format("~n======ATTEMPTING ~w DAYS======~n",[NumDays]),
+        valid_schedule(NumDays,S1),
+        format("=====NEW SCHEDULE=====~n~w~n",[S1]),
+        schedule_days(S1,S2,0),
+        flatten(S2,S3),
+        pick_jobs(S3,Removed,Shifts),
         gensym(tess,Tess),
 	maplist(recorda(Tess),Shifts),
         format("=====New Attempt=====~n"),
         schedule(Tess,Schedule),
+        assert(fillable_schedule(Schedule,Removed)),
         output_schedule(Schedule,0).
     %findall(Schedule-R,
     %            (

@@ -88,7 +88,8 @@ pounder_day(Day, [
             job(packhelp2_2, packhelp, Day, 15.5-18)
 	]).
 
-pick_jobs(Jobs,Result) :-
+% pick_jobs(+Jobs,-Removed,-Result)
+pick_jobs(Jobs,JobsToRemove,Result) :-
     RemovableJobs = [
         packhelp2_1,
         packhelp2_2,
@@ -96,10 +97,19 @@ pick_jobs(Jobs,Result) :-
         ketcleanhelp,
         packhelp3,
         packhelp4,
+        packhelp1,
+        packhelp2,
         packhonch4,
+        packhonch3,
+        packhonch2,
         trays3,
         curd2,
-        ket2],
+        ket2,
+        ket1,
+        startup,
+        trays2,
+        trays1
+        ],
     prefix(JobsToRemove,RemovableJobs),
     length(JobsToRemove,L),
     L > 0,

@@ -265,40 +265,5 @@ schedule(DBId, Schedule) :-
     Schedule = Assignments.
 
 
-test_day(Day,Schedule) :-
-    schedules(Day, Schedule),
-    format("."),
-    flush_output,
-    gensym(Day,DBId),
-    maplist(recorda(DBId),Schedule),
-    schedule(DBId,_) -> format("~n~w day(s) is schedulable.~n", [Day]) 
-              ; format("~nCannot schedule ~w day(s).~n",[Day]). 
-
-max_days_parallel() :-
-    spawn(ignore(test_day(1,_))),
-    spawn(ignore(test_day(2,_))),
-    spawn(ignore(test_day(3,_))),
-    spawn(ignore(test_day(4,_))),
-    spawn(ignore(test_day(5,F5))),
-    await(F5),
-    format("~nDONE~n").
-
-max_days() :-
-    test_day(1,R1),
-    format("~n~nJOBS 1~n~n"),
-    format("~w~n~n",[R1]),
-    test_day(2,R2),
-    format("~n~nJOBS 2~n~n"),
-    format("~w~n~n",[R2]),
-    test_day(3,R3),
-    format("~n~nJOBS 3~n~n"),
-    format("~w~n~n",[R3]),
-    test_day(4,R4),
-    format("~n~nJOBS 4~n~n"),
-    format("~w~n~n",[R4]),
-    test_day(5,R5),
-    format("~n~nJOBS 5~n~n"),
-    format("~w~n~n",[R5]),
-    format("~nDONE~n").
 
 curmax(-10000000).
